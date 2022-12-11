@@ -3,9 +3,9 @@ import os
 import typing
 import re
 
-from .connections import minio
-from .connections import aws
-from .enums import ConnectionTarget
+from s3 import minio
+from s3 import aws
+from s3.enums import ConnectionTarget
 
 ARCHIVE_BUCKET = "archive"
 
