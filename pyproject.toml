@@ -6,7 +6,7 @@ authors = ["Ibis Prevedello <ibiscp@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.10"
+python = ">=3.8,<3.10"
 minio = "7.0.3"
 boto3 = "1.20.26"
 

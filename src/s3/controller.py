@@ -129,7 +129,7 @@ def archive_bucket(
     return True
 
 
-def put_object(bucket: str, object_name: str, data: str) -> bool:
+def put_object(bucket: str, object_name: str, data: str, save_pickle: bool = False) -> bool:
     """
     Stores string data as an s3 object in a given bucket.
     If any data needs to be stored, use upload_object to store a file.
@@ -144,16 +144,16 @@ def put_object(bucket: str, object_name: str, data: str) -> bool:
     """
     target = get_current_target()
     if target == ConnectionTarget.MINIO:
-        return minio.put_object(bucket, object_name, data)
+        return minio.put_object(bucket, object_name, data, save_pickle)
     elif target == ConnectionTarget.AWS:
-        return aws.put_object(bucket, object_name, data)
+        return aws.put_object(bucket, object_name, data, save_pickle)
     elif target == ConnectionTarget.UNKNOWN:
         return False
 
     return False
 
 
-def get_object(bucket: str, object_name: str) -> str:
+def get_object(bucket: str, object_name: str, unpickle:bool = False) -> str:
     """
     Returns data from an s3 object as string data.
     If any data needs to be loaded, use fget_object to download a file.
@@ -167,9 +167,9 @@ def get_object(bucket: str, object_name: str) -> str:
     """
     target = get_current_target()
     if target == ConnectionTarget.MINIO:
-        return minio.get_object(bucket, object_name)
+        return minio.get_object(bucket, object_name, unpickle)
     elif target == ConnectionTarget.AWS:
-        return aws.get_object(bucket, object_name)
+        return aws.get_object(bucket, object_name, unpickle)
     elif target == ConnectionTarget.UNKNOWN:
         return None
 

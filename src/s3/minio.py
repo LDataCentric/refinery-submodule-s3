@@ -5,6 +5,7 @@ from minio import Minio  # note that this minio is the package and not the curre
 from minio.notificationconfig import NotificationConfig, QueueConfig
 from minio.commonconfig import CopySource
 import os
+import pickle
 
 __client = None
 
@@ -45,32 +46,45 @@ def create_bucket(bucket: str) -> bool:
     return True
 
 
-def put_object(bucket: str, object_name: str, data: str) -> str:
+def put_object(bucket: str, object_name: str, data: str, save_pickle:bool=False) -> str:
     client = __get_client()
 
     if not bucket_exists(bucket):
         create_bucket(bucket)
 
-    client.put_object(
-        bucket_name=bucket,
-        object_name=object_name,
-        data=io.BytesIO(bytes(data.encode("UTF-8"))),
-        length=-1,
-        content_type="application/json",
-        part_size=1_000_000_000,
-    )
+    if save_pickle:
+        client.put_object(
+            bucket_name=bucket,
+            object_name=object_name,
+            data=io.BytesIO(pickle.dumps(data)),
+            length=-1,
+            # content_type="application/pickle",
+            part_size=1_000_000_000,
+        )
+    else:
+        client.put_object(
+            bucket_name=bucket,
+            object_name=object_name,
+            data=io.BytesIO(bytes(data.encode("UTF-8"))),
+            length=-1,
+            content_type="application/json",
+            part_size=1_000_000_000,
+        )
     return True
 
 
-def get_object(bucket: str, object_name: str) -> str:
+def get_object(bucket: str, object_name: str, unpickle: bool = False) -> str:
     client = __get_client()
 
     if not bucket_exists(bucket):
         return ""
 
-    return client.get_object(bucket_name=bucket, object_name=object_name).data.decode(
-        "UTF-8"
-    )
+    if unpickle:
+        return pickle.loads(client.get_object(bucket_name=bucket, object_name=object_name).data)
+    else:
+        return client.get_object(bucket_name=bucket, object_name=object_name).data.decode(
+            "UTF-8"
+        )
 
 
 def download_object(bucket: str, object_name: str, file_type: str) -> str:
