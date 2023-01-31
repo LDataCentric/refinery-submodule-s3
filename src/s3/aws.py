@@ -171,7 +171,7 @@ def create_data_upload_link(bucket: str, object_name: str) -> str:
     )
 
 
-def create_file_upload_link(bucket: str, object_name: str) -> str:
+def create_file_upload_link(bucket: str, object_name: str, external: bool = False) -> str:
     client = __get_client()
 
     if not bucket_exists(bucket):

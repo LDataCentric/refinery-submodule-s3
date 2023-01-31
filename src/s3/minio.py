@@ -29,6 +29,15 @@ def __get_client() -> Minio:
     return __client
 
 
+def __get_client_external() -> Minio:
+    return Minio(
+        os.getenv("S3_ENDPOINT"),
+        access_key=os.getenv("S3_ACCESS_KEY"),
+        secret_key=os.getenv("S3_SECRET_KEY"),
+        secure=False,
+    )
+
+
 def create_bucket(bucket: str) -> bool:
     client = __get_client()
     client.make_bucket(bucket)
@@ -46,7 +55,9 @@ def create_bucket(bucket: str) -> bool:
     return True
 
 
-def put_object(bucket: str, object_name: str, data: str, save_pickle:bool=False) -> str:
+def put_object(
+    bucket: str, object_name: str, data: str, save_pickle: bool = False
+) -> str:
     client = __get_client()
 
     if not bucket_exists(bucket):
@@ -80,11 +91,13 @@ def get_object(bucket: str, object_name: str, unpickle: bool = False) -> str:
         return ""
 
     if unpickle:
-        return pickle.loads(client.get_object(bucket_name=bucket, object_name=object_name).data)
-    else:
-        return client.get_object(bucket_name=bucket, object_name=object_name).data.decode(
-            "UTF-8"
+        return pickle.loads(
+            client.get_object(bucket_name=bucket, object_name=object_name).data
         )
+    else:
+        return client.get_object(
+            bucket_name=bucket, object_name=object_name
+        ).data.decode("UTF-8")
 
 
 def download_object(bucket: str, object_name: str, file_type: str) -> str:
@@ -160,8 +173,10 @@ def create_data_upload_link(bucket: str, object_name: str) -> str:
     )
 
 
-def create_file_upload_link(bucket: str, object_name: str) -> str:
-    client = __get_client()
+def create_file_upload_link(
+    bucket: str, object_name: str, external: bool = False
+) -> str:
+    client = __get_client_external() if external else __get_client()
 
     if not bucket_exists(bucket):
         create_bucket(bucket)

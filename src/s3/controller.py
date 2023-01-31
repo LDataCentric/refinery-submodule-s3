@@ -302,7 +302,7 @@ def create_data_upload_link(bucket: str, object_name: str) -> str:
     return None
 
 
-def create_file_upload_link(bucket: str, object_name: str) -> str:
+def create_file_upload_link(bucket: str, object_name: str, external: bool = False) -> str:
     """
     Creates a presigned url using put_object.
     If the bucket doesn't exist yet it will be created.
@@ -318,9 +318,9 @@ def create_file_upload_link(bucket: str, object_name: str) -> str:
     """
     target = get_current_target()
     if target == ConnectionTarget.MINIO:
-        return minio.create_file_upload_link(bucket, object_name)
+        return minio.create_file_upload_link(bucket, object_name, external)
     elif target == ConnectionTarget.AWS:
-        return aws.create_file_upload_link(bucket, object_name)
+        return aws.create_file_upload_link(bucket, object_name, external)
     elif target == ConnectionTarget.UNKNOWN:
         return None
 
